@@ -1,13 +1,33 @@
+import { json, LoaderFunctionArgs } from "@remix-run/cloudflare";
 import {
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  useRouteLoaderData,
 } from "@remix-run/react";
 import "./tailwind.css";
 
+declare global {
+  interface Window {
+    ENV: {
+      PUBLIC_LUCHY_TOKEN: string;
+    };
+  }
+}
+
+export const loader = ({ context }: LoaderFunctionArgs) => {
+  return json({
+    ENV: {
+      PUBLIC_LUCHY_TOKEN: context.cloudflare.env.PUBLIC_LUCHY_TOKEN,
+    },
+  });
+};
+
 export function Layout({ children }: { children: React.ReactNode }) {
+  const data = useRouteLoaderData<typeof loader>("root");
+
   return (
     <html lang="en">
       <head>
@@ -19,6 +39,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         {children}
         <ScrollRestoration />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(data?.ENV)}`,
+          }}
+        />
         <Scripts />
       </body>
     </html>
