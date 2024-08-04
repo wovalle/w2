@@ -1,6 +1,8 @@
 import { getTracker } from "@luchyio/react"
 import type { MetaFunction } from "@remix-run/cloudflare"
-import { Link } from "@remix-run/react"
+import { Link, json, useLoaderData } from "@remix-run/react"
+import { getPosts } from "../.server/posts"
+import { Post } from "../components/post"
 
 export const meta: MetaFunction = () => {
   return [
@@ -12,8 +14,17 @@ export const meta: MetaFunction = () => {
   ]
 }
 
+export const loader = async () => {
+  const posts = await getPosts()
+
+  return json({
+    featuredPosts: posts.filter((post) => post.frontmatter.featured),
+  })
+}
+
 export default function Index() {
   const luchy = getTracker()
+  const { featuredPosts } = useLoaderData<typeof loader>()
 
   return (
     <div className="font-sans p-4">
@@ -23,10 +34,8 @@ export default function Index() {
           <Link
             to="/foo"
             className="text-blue-700 underline visited:text-purple-900"
-            target="_blank"
-            rel="noreferrer"
           >
-            Remix Docs
+            Foo link
           </Link>
         </li>
         <li>
@@ -50,6 +59,17 @@ export default function Index() {
           </button>
         </li>
       </ul>
+
+      <section>
+        <h3 className="text-xl tracking-wide">✨ FEATURED ✨</h3>
+        <ul className="mt-4 space-y-8">
+          {featuredPosts.map((post) => (
+            <li key={post.slug}>
+              <Post {...post} />
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   )
 }

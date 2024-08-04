@@ -14,7 +14,6 @@
     "typegen": "wrangler types"
   },
   "dependencies": {
-    "@biomejs/biome": "^1.8.3",
     "@luchyio/adapter-kysely": "^1.1.1",
     "@luchyio/middleware": "^1.1.0",
     "@luchyio/react": "^1.5.1",
@@ -28,17 +27,24 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.8.3",
     "@cloudflare/workers-types": "^4.20240729.0",
+    "@mdx-js/rollup": "^3.0.1",
     "@remix-run/dev": "^2.11.0",
+    "@tailwindcss/typography": "^0.5.13",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.40",
+    "rehype-pretty-code": "^0.13.2",
+    "remark-frontmatter": "^5.0.0",
+    "remark-mdx-frontmatter": "^5.0.0",
+    "remix-development-tools": "^4.2.2",
     "tailwindcss": "^3.4.7",
     "typescript": "^5.5.4",
     "vite": "^5.3.5",
     "vite-tsconfig-paths": "^4.3.2",
-    "wrangler": "3.67.1"
+    "wrangler": "3.68.0"
   },
   "engines": {
     "node": ">=20.0.0"
