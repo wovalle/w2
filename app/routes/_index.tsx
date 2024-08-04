@@ -39,6 +39,14 @@ export default function Index() {
             Trigger event
           </button>
         </li>
+        <li>
+          <button
+            data-luchy-event="cta-click"
+            className="text-blue-700 underline visited:text-purple-900"
+          >
+            Automatic event
+          </button>
+        </li>
       </ul>
     </div>
   );
