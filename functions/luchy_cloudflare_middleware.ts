@@ -1,25 +1,25 @@
-import { EventContext, Request } from "@cloudflare/workers-types";
+import type { EventContext, Request } from "@cloudflare/workers-types"
 import {
-  luchyMiddleware,
   type LuchyMiddlewareInitOptions,
   type RequestLike,
   type ResponseLike,
-} from "@luchyio/middleware";
+  luchyMiddleware,
+} from "@luchyio/middleware"
 
 const extractCloudflareStuff = async (
   req: Request,
-  environment: "development" | "production" | undefined
+  environment: "development" | "production" | undefined,
 ): Promise<RequestLike> => {
-  const url = new URL(req.url);
-  const params = Object.fromEntries(url.searchParams);
+  const url = new URL(req.url)
+  const params = Object.fromEntries(url.searchParams)
 
-  let body: Record<string, unknown> | null = null;
+  let body: Record<string, unknown> | null = null
 
   if (req.headers.get("content-type") === "application/json") {
-    body = await req.json();
+    body = await req.json()
   }
 
-  const isLuchyRequest = url.pathname.startsWith("/luchy");
+  const isLuchyRequest = url.pathname.startsWith("/luchy")
 
   return {
     url: req.url,
@@ -46,15 +46,15 @@ const extractCloudflareStuff = async (
         (environment === "development" ? "127.0.0.1" : undefined) ??
         null,
     },
-  };
-};
+  }
+}
 
 type CloudflareContext = Omit<
-  EventContext<Env, any, Record<string, unknown>>,
+  EventContext<Env, string, Record<string, unknown>>,
   "next" | "env"
 > & {
-  next: () => Promise<Response>;
-};
+  next: () => Promise<Response>
+}
 
 const cfResponseLikeHandler = (next: CloudflareContext["next"]) => {
   return async (opts: { reason: string; action: ResponseLike }) => {
@@ -62,73 +62,69 @@ const cfResponseLikeHandler = (next: CloudflareContext["next"]) => {
       case "response":
         return Response.json(opts.action.json, {
           status: opts.action.status,
-        });
+        })
 
       case "next":
-        return next();
+        return next()
 
       default:
-        throw new Error("Invalid response-like type");
+        throw new Error("Invalid response-like type")
     }
-  };
-};
+  }
+}
 
 export const cloudflareLuchyMiddlewareFactory = (
-  initOptions: Omit<LuchyMiddlewareInitOptions, "origin">
+  initOptions: Omit<LuchyMiddlewareInitOptions, "origin">,
 ) => {
   return async (context: CloudflareContext) => {
     const reqLike = await extractCloudflareStuff(
       context.request,
-      initOptions.environment
-    );
-    const handleResponseLike = cfResponseLikeHandler(context.next);
-    const { logger } = initOptions;
+      initOptions.environment,
+    )
+    const handleResponseLike = cfResponseLikeHandler(context.next)
+    const { logger } = initOptions
 
     logger?.debug(
       "request",
       reqLike.method,
       reqLike.url,
-      reqLike.isLuchyRequest
-    );
+      reqLike.isLuchyRequest,
+    )
 
     try {
       if (!reqLike.isLuchyRequest) {
         context.waitUntil(
           luchyMiddleware("@luchyio/cloudflare", initOptions, reqLike).then(
-            handleResponseLike
-          )
-        );
-
-        return await context.next();
-      } else {
-        return await luchyMiddleware(
-          "@luchyio/cloudflare",
-          initOptions,
-          reqLike
+            handleResponseLike,
+          ),
         )
-          .then(handleResponseLike)
-          .catch((e) => {
-            logger?.error("Error processing luchy message", e);
 
-            return handleResponseLike({
-              reason: "internal-error",
-              action: {
-                type: "response",
-                status: 500,
-                json: { error: { message: e.message } },
-              },
-            });
-          });
+        return await context.next()
       }
+
+      return await luchyMiddleware("@luchyio/cloudflare", initOptions, reqLike)
+        .then(handleResponseLike)
+        .catch((e) => {
+          logger?.error("Error processing luchy message", e)
+
+          return handleResponseLike({
+            reason: "internal-error",
+            action: {
+              type: "response",
+              status: 500,
+              json: { error: { message: e.message } },
+            },
+          })
+        })
     } catch (e) {
-      logger?.error("Error processing luchy message", e);
+      logger?.error("Error processing luchy message", e)
 
       return await handleResponseLike({
         reason: "internal-error",
         action: {
           type: "next",
         },
-      });
+      })
     }
-  };
-};
+  }
+}

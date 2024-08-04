@@ -6,3 +6,5 @@ node_modules
 .dev.vars
 
 .wrangler
+*.http
+worker-configuration.d.ts

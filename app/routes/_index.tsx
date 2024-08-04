@@ -1,6 +1,6 @@
-import { getTracker } from "@luchyio/react";
-import type { MetaFunction } from "@remix-run/cloudflare";
-import { Link } from "@remix-run/react";
+import { getTracker } from "@luchyio/react"
+import type { MetaFunction } from "@remix-run/cloudflare"
+import { Link } from "@remix-run/react"
 
 export const meta: MetaFunction = () => {
   return [
@@ -9,11 +9,11 @@ export const meta: MetaFunction = () => {
       name: "description",
       content: "Welcome to Remix on Cloudflare!",
     },
-  ];
-};
+  ]
+}
 
 export default function Index() {
-  const luchy = getTracker();
+  const luchy = getTracker()
 
   return (
     <div className="font-sans p-4">
@@ -31,8 +31,9 @@ export default function Index() {
         </li>
         <li>
           <button
+            type="button"
             onClick={() => {
-              luchy.collectEvent("test_event", { test: "data" });
+              luchy.collectEvent("test_event", { test: "data" })
             }}
             className="text-blue-700 underline visited:text-purple-900"
           >
@@ -41,6 +42,7 @@ export default function Index() {
         </li>
         <li>
           <button
+            type="button"
             data-luchy-event="cta-click"
             className="text-blue-700 underline visited:text-purple-900"
           >
@@ -49,5 +51,5 @@ export default function Index() {
         </li>
       </ul>
     </div>
-  );
+  )
 }

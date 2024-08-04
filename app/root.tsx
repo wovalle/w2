@@ -1,4 +1,4 @@
-import { json, LoaderFunctionArgs } from "@remix-run/cloudflare";
+import { type LoaderFunctionArgs, json } from "@remix-run/cloudflare"
 import {
   Links,
   Meta,
@@ -6,14 +6,14 @@ import {
   Scripts,
   ScrollRestoration,
   useRouteLoaderData,
-} from "@remix-run/react";
-import "./tailwind.css";
+} from "@remix-run/react"
+import "./tailwind.css"
 
 declare global {
   interface Window {
     ENV: {
-      PUBLIC_LUCHY_TOKEN: string;
-    };
+      PUBLIC_LUCHY_TOKEN: string
+    }
   }
 }
 
@@ -22,11 +22,11 @@ export const loader = ({ context }: LoaderFunctionArgs) => {
     ENV: {
       PUBLIC_LUCHY_TOKEN: context.cloudflare.env.PUBLIC_LUCHY_TOKEN,
     },
-  });
-};
+  })
+}
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const data = useRouteLoaderData<typeof loader>("root");
+  const data = useRouteLoaderData<typeof loader>("root")
 
   return (
     <html lang="en">
@@ -40,6 +40,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
         <ScrollRestoration />
         <script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: needed to pass data to the client
           dangerouslySetInnerHTML={{
             __html: `window.ENV = ${JSON.stringify(data?.ENV)}`,
           }}
@@ -47,9 +48,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Scripts />
       </body>
     </html>
-  );
+  )
 }
 
 export default function App() {
-  return <Outlet />;
+  return <Outlet />
 }

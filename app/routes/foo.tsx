@@ -1,4 +1,4 @@
-import type { MetaFunction } from "@remix-run/cloudflare";
+import type { MetaFunction } from "@remix-run/cloudflare"
 
 export const meta: MetaFunction = () => {
   return [
@@ -7,9 +7,9 @@ export const meta: MetaFunction = () => {
       name: "description",
       content: "Welcome to Remix on Cloudflare!",
     },
-  ];
-};
+  ]
+}
 
 export default function FooPage() {
-  return <div className="font-sans p-4">foo</div>;
+  return <div className="font-sans p-4">foo</div>
 }
